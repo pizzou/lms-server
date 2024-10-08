@@ -21,9 +21,9 @@ COPY . .
 RUN npm run build
 
 # Expose the port
-EXPOSE 8000
+EXPOSE 5000
 
-ENV PORT=8000
+ENV PORT=5000
 
 # Command to run the application
 CMD [ "node", "dist/server.js" ]
