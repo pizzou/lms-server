@@ -14,13 +14,14 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 const MONGO_URI = process.env.MONGO_URI;
 
-app.use(
-  cors({
-    origin: process.env.CLIENT_URL,
-    methods: ["GET", "POST", "DELETE", "PUT"],
-    allowedHeaders: ["Content-Type", "Authorization"],
-  })
-);
+const corsOptions = {
+  origin: 'https://lms-front-end-two.vercel.app', // Frontend URL
+  methods: ['GET', 'POST', 'PUT', 'DELETE'], // Allow the necessary HTTP methods
+  credentials: true, // Allow cookies if you're using them
+};
+
+// Enable CORS
+app.use(cors(corsOptions));
 
 app.use(express.json());
 
