@@ -16,10 +16,27 @@ const MONGO_URI = process.env.MONGO_URI;
 
 const allowedOrigins = [
   'http://localhost:5173',        
-  'https://lms-front-end-two.vercel.app' 
+  'https://lms-front-end-two.vercel.app'
 ];
 
+// CORS middleware with proper preflight request handling
 app.use(cors({
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin)) {
+      console.log(`CORS allowed for origin: ${origin}`);
+      callback(null, true);
+    } else {
+      console.log(`CORS blocked for origin: ${origin}`);
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true, // Allow credentials (cookies, authorization headers)
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Allowed HTTP methods
+  allowedHeaders: ['Content-Type', 'Authorization'], // Allowed headers in requests
+}));
+
+// Middleware to handle preflight requests explicitly
+app.options('*', cors({
   origin: (origin, callback) => {
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
@@ -27,19 +44,23 @@ app.use(cors({
       callback(new Error('Not allowed by CORS'));
     }
   },
-  credentials: true, // if your API uses cookies or authentication tokens
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
 }));
-
 
 app.use(express.json());
 
-//database connection
+// Database connection
 mongoose
   .connect(MONGO_URI)
-  .then(() => console.log("mongodb is connected"))
-  .catch((e) => console.log(e));
+  .then(() => console.log("MongoDB is connected"))
+  .catch((e) => {
+    console.error("Error connecting to MongoDB:", e.message);
+    process.exit(1); // Exit server if the database connection fails
+  });
 
-//routes configuration
+// Routes configuration
 app.use("/auth", authRoutes);
 app.use("/media", mediaRoutes);
 app.use("/instructor/course", instructorCourseRoutes);
@@ -48,14 +69,21 @@ app.use("/student/order", studentViewOrderRoutes);
 app.use("/student/courses-bought", studentCoursesRoutes);
 app.use("/student/course-progress", studentCourseProgressRoutes);
 
+// Error handling middleware
 app.use((err, req, res, next) => {
-  console.log(err.stack);
+  console.error("Internal Server Error:", err.stack);
   res.status(500).json({
     success: false,
     message: "Something went wrong",
   });
 });
 
+// Server health check
+app.get("/health", (req, res) => {
+  res.status(200).json({ status: "Server is healthy" });
+});
+
+// Start the server
 app.listen(PORT, () => {
-  console.log(`Server is now running on port ${PORT}`);
+  console.log(`Server is running on port ${PORT}`);
 });
