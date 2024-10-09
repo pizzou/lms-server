@@ -14,27 +14,27 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 const MONGO_URI = process.env.MONGO_URI;
 
-// CORS configuration
+// Ensure CORS configuration is correct
 const corsOptions = {
   origin: 'https://lms-front-end-two.vercel.app', // Frontend URL
-  methods: ['GET', 'POST', 'PUT', 'DELETE'], // Allow the necessary HTTP methods
-  credentials: true, // Allow cookies and credentials
-  allowedHeaders: ['Content-Type', 'Authorization'], // Allow headers necessary for auth
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  credentials: true, // If using cookies or Authorization headers, set this to true
+  allowedHeaders: ['Content-Type', 'Authorization'], // Allow necessary headers
 };
 
-// Enable CORS
+// Use CORS before any other middleware or routes
 app.use(cors(corsOptions));
 
-// Middleware to handle preflight OPTIONS request
+// Middleware to handle preflight requests
 app.options('*', cors(corsOptions));
 
-// Middleware to parse incoming JSON requests
+// Middleware to parse JSON bodies
 app.use(express.json());
 
-// Database connection
+// MongoDB connection
 mongoose
   .connect(MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
-  .then(() => console.log("MongoDB is connected"))
+  .then(() => console.log("MongoDB connected"))
   .catch((error) => {
     console.error("MongoDB connection error:", error);
   });
@@ -59,5 +59,5 @@ app.use((err, req, res, next) => {
 
 // Start the server
 app.listen(PORT, () => {
-  console.log(`Server is now running on port ${PORT}`);
+  console.log(`Server is running on port ${PORT}`);
 });
