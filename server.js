@@ -16,7 +16,7 @@ const MONGO_URI = process.env.MONGO_URI;
 
 // Ensure CORS configuration is correct
 const corsOptions = {
-  origin: ['https://lms-front-end-two.vercel.app','http://localhost:3000',],
+  origin: 'https://lms-front-end-two.vercel.app', // Frontend URL
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   credentials: true, // If using cookies or Authorization headers, set this to true
   allowedHeaders: ['Content-Type', 'Authorization'], // Allow necessary headers
